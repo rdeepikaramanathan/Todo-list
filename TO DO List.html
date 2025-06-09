@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="Add a new task">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+
+    <script>
+        // Load tasks from localStorage on page load
+        window.onload = function () {
+            const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskList = document.getElementById('taskList');
+
+            savedTasks.forEach(task => {
+                const li = document.createElement('li');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = task.completed;
+                checkbox.onchange = function () {
+                    task.completed = checkbox.checked;
+                    saveTasks();
+                };
+
+                const taskText = document.createElement('span');
+                taskText.textContent = task.text;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function () {
+                    taskList.removeChild(li);
+                    saveTasks();
+                };
+
+                li.appendChild(checkbox);
+                li.appendChild(taskText);
+                li.appendChild(deleteButton);
+                taskList.appendChild(li);
+            });
+        };
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskList = document.getElementById('taskList');
+
+            if (taskInput.value.trim() !== '') {
+                const li = document.createElement('li');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.onchange = function () {
+                    saveTasks();
+                };
+
+                const taskText = document.createElement('span');
+                taskText.textContent = taskInput.value;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function () {
+                    taskList.removeChild(li);
+                    saveTasks();
+                };
+
+                li.appendChild(checkbox);
+                li.appendChild(taskText);
+                li.appendChild(deleteButton);
+                taskList.appendChild(li);
+                taskInput.value = '';
+
+                saveTasks();
+            }
+        }
+
+        function saveTasks() {
+            const taskList = document.getElementById('taskList');
+            const tasks = [];
+
+            taskList.querySelectorAll('li').forEach(li => {
+                const checkbox = li.querySelector('input[type="checkbox"]');
+                const taskText = li.querySelector('span').textContent;
+                tasks.push({ text: taskText, completed: checkbox.checked });
+            });
+
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+    </script>
+</body>
+</html>
